@@ -1,6 +1,6 @@
 # Przelewy24 mobile library documentation
 
-Przelewy24 mobile libraries render the possibility of integrating Przelewy24 payments with mobile applications as it is the case with web payments. The documentation below is based on the www payment integration documentation:
+Przelewy24 mobile libraries provides the possibility of integrating Przelewy24 payments with mobile applications as it is the case with web payments. The documentation below is based on the www payment integration documentation:
 
 [Przelewy24 payment integration documentation](https://www.przelewy24.pl/storage/app/media/pobierz/Instalacja/przelewy24_dokumentacja_3.2.pdf)
 
@@ -8,18 +8,13 @@ In order to carry out integration with Przelewy24, merchant’s details must be 
 - Tel: +48 61 642 93 45
 - Email: <oferty@przelewy24.pl>
 
-### Detailed integration procedures for the specific platforms may be found here:
-
-- [Android](https://github.com/przelewy24/p24-mobile-lib-android)
-- [iOS](https://github.com/przelewy24/p24-mobile-lib-ios)
-
 ## 1. System description
 
 Przelewy24 mobile libraries are native libraries for Android and iOS platforms. They enable payments within mobile applications without having to switch users between a given application, a web browser or yet another application. The entire transaction process is carried out in one application window. The libraries offer different methods of payment, e.g. bank transfers, payment cards, BLIK, virtual wallets (PayPal, SkyCash, etc.).
 
 ### 1.1 How does a transaction with the use of a mobile library proceed?
 
-Once the payment is called, a payment window is displayed on the smartphone screen. The window contains a WebView control with przelewy24.pl transaction system loaded. After the payment method is selected, the website of the selected bank/method is loaded in the same window. The user logs on to their account or provides the necessary payment details (e.g. payment card details, BLIK code, etc.) and next, accepts the payment. The library window closes with the status “payment finished” or the error code (e.g. if the user logged out of the bank without accepting the payment or provided the wrong BLIK code).
+Once the payment is called, a payment window is displayed on the smartphone screen. The window contains a WebView control with przelewy24.pl transaction system loaded. After the payment method is selected, the website of the selected bank/method is loaded in the same window. The user logs on to their account or provides the necessary payment details (e.g. payment card details, BLIK code, etc.) and next, accepts the payment. The library window closes with the status "payment finished" or the error code (e.g. if the user logged out of the bank without accepting the payment or provided the wrong BLIK code).
 
 ![](img/diagram1.png)
 
@@ -51,9 +46,9 @@ As a result, a TOKEN is generated. In order to initiate the transaction in the m
 
 ### 1.3 Transaction verification
 
-fter the payment is made, the library finishes operation and returns to the application. It does not wait for the transaction to be posted in Przelewy24. The library yields the  `paymentFinished`, or `paymentError`status if anything has gone wrong. At the time the payment is posted, Przelewy24 sends an asynchronic transaction notification to the address `p24_url_status` provided by the partner during the configuration process. Upon reception of the notification, the partner’s server must send a transaction verification request to Przelewy24. At that time, the merchant’s server possesses information that the payment has been posted. Then, the application should inquire its server about the transaction status.   
+After the payment is made, the library finishes operation and returns to the application. It does not wait for the transaction to be posted in Przelewy24. The library yields the  `paymentFinished`, or `paymentError` status if anything has gone wrong. At the time the payment is posted, Przelewy24 sends an asynchronous notification to the address `p24_url_status` provided by the partner during the configuration process. Upon receive of the notification, the partner’s server must send a transaction verification request to Przelewy24. At that time, the merchant’s server possesses information that the payment has been posted. Then, the application should call its server to check the transaction status.   
 
-The `p24_url_status` parameter must be set in the transaction panel (in order to do so, send the address of the script to  [serwis@przelewy24.pl](serwis@przelewy24.pl) rom the e-mail address provided during account registration) or in the library:
+The `p24_url_status` parameter must be set in the transaction panel (in order to do so, send the address of the script to  [serwis@przelewy24.pl](serwis@przelewy24.pl) from the e-mail address provided during account registration) or in the library:
 `paymentParams.setUrlStatus("http://XXXXXX")`
 The library setting has got higher priority than the transaction panel setting.
 
