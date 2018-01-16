@@ -16,7 +16,7 @@ Przelewy24 mobile libraries are native libraries for Android and iOS platforms. 
 
 Once the payment is called, a payment window is displayed on the smartphone screen. The window contains a WebView control with przelewy24.pl transaction system loaded. After the payment method is selected, the website of the selected bank/method is loaded in the same window. The user logs on to their account or provides the necessary payment details (e.g. payment card details, BLIK code, etc.) and next, accepts the payment. The library window closes with the status "payment finished" or the error code (e.g. if the user logged out of the bank without accepting the payment or provided the wrong BLIK code).
 
-![](img/diagram1.png)
+![](img/daigram1-eng.png)
 
 ### 1.2 Initiating the transaction
 
