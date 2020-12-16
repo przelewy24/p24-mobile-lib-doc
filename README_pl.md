@@ -2,7 +2,7 @@
 
 Biblioteki mobilne Przelewy24 umożliwiają integrację płatności Przelewy24 w aplikacjach mobilnych, analogicznie jak w przypadku płatności web. Poniższa dokumentacja bazuje na dokumentacji integracji płatności www:
 
-[Dokumentacja integracji płatności www Przelewy24](https://www.przelewy24.pl/storage/app/media/pobierz/Instalacja/przelewy24_dokumentacja_3.2.pdf)
+[Dokumentacja integracji płatności www Przelewy24](https://developers.przelewy24.pl/index.php?pl)
 
 
 Aby móc dokonać integracji z systemem Przelewy24 niezbędne są dane sprzedawcy. Jeżeli ich nie posiadasz, możesz je uzyskać kontaktując się z działem handlowym:
@@ -23,38 +23,26 @@ Po wywołaniu płatności na ekranie smartfonu pojawia się okno płatności, za
 
 ### 1.2 Inicjowanie płatności
 
-Biblioteka umożliwia zainicjowanie transakcji na dwa sposoby:
+Do zainicjowania płatności konieczne jest zarejestrowanie transakcji za pomocą osobnego zapytania z serwera partnera. Opis rejestracji transakcji znajduje się w dokumentacji płatności www [link](https://developers.przelewy24.pl/index.php?pl#tag/Obsluga-transakcji-API/paths/~1api~1v1~1transaction~1register/post).
 
-- podając dane transakcji bezpośrednio w bibliotece
-- rejestrując wcześniej transakcję z poziomu serwera sprzedawcy i przekazując do biblioteki otrzymany przy rejestracji token transakcji
+Jeżeli transakcja ma być zrealizowana w bibliotece mobilnej, przy rejestracji należy dodać parametry: `mobileLib=1` oraz `sdkVersion=X`, w którym należy podać numer wersji biblioteki mobilnej. Wartość tego parametru można pobrać bezpośrednio z biblioteki z klasy `P24SdkVersion` (iOS - `P24SdkVersion.value`, Android - `P24SdkVersion.value()`).
 
-### 1.2.1 Wejście bezpośrednio z danymi transakcji
-
-Aby zainicjować transakcję bezpośrednio parametrami płatności, należy wywołać metodę `trnDirect` i przekazać do niej id partnera (`merchantId`), kod `CRC` (dostępny w panelu partnera) oraz dane o transakcji – kwotę (wyrażoną w groszach), walutę (np. „PLN”), e-mail klienta, oraz id sesji (unikalne dla każdej transakcji). Dodatkowo można podać dane adresowe klienta (nazwisko, adres, miasto, kod pocztowy, kraj), które są wymagane dla płatności kartą, oraz opis transakcji, który będzie wyświetlany w panelu transakcyjnym Przelewy24.
-
-
-### 1.2.2 Wejście z tokenem transakcji
-
-Możliwe jest zarejestrowanie transakcji za pomocą osobnego zapytania z serwera partnera. Opis rejestracji transakcji znajduje się w dokumentacji płatności www [link](https://www.przelewy24.pl/storage/app/media/pobierz/Instalacja/przelewy24_dokumentacja_3.2.pdf).
-
-Jeżeli transakcja ma być zrealizowana w bibliotece mobilnej, przy rejestracji należy dodać parametry: `p24_mobile_lib=1` oraz `p24_sdk_version=X`, w którym należy podać numer wersji biblioteki mobilnej. Wartość tego parametru można pobrać bezpośrednio z biblioteki (iOS - klasa `P24`, Android - klasa `P24SdkVersion`).
-
-W wyniku rejestracji transakcji otrzymujemy TOKEN. Aby zainicjować transakcję w bibliotece mobilnej wystarczy przekazać ten token do metody `trnRequest`.
+W wyniku rejestracji transakcji otrzymujemy TOKEN. Aby zainicjować transakcję w bibliotece mobilnej wystarczy przekazać ten token do metody `Transfer`.
 
 **UWAGA!**
 
  > Rejestrując transakcję, która będzie wykonana w bibliotece mobilnej należy pamiętać o dodatkowych parametrach:
-- `p24_channel` – jeżeli nie będzie ustawiony, to domyślnie w bibliotece pojawią się formy płatności „przelew tradycyjny” i „użyj przedpłatę”, które są niepotrzebne przy płatności mobilnej. Aby wyłączyć te opcje należy ustawić w tym parametrze flagi nie uwzględniające tych form (np. wartość 3 – przelewy i karty, domyślnie ustawione w bibliotece przy wejściu `trnDirect`)
-- `p24_method` – jeżeli w bibliotece dla danej transakcji ma być ustawiona domyślnie dana metoda płatności, należy ustawić ją w tym parametrze przy rejestracji
-- `p24_url_status` - adres, który zostanie wykorzystany do weryfikacji transakcji przez serwer partnera po zakończeniu procesu płatności w bibliotece mobilnej
+- `channel` – jeżeli nie będzie ustawiony, to domyślnie w bibliotece pojawią się formy płatności „przelew tradycyjny” i „użyj przedpłatę”, które są niepotrzebne przy płatności mobilnej. Aby wyłączyć te opcje należy ustawić w tym parametrze flagi nie uwzględniające tych form (np. wartość 3 – przelewy i karty)
+- `method` – jeżeli w bibliotece dla danej transakcji ma być ustawiona domyślnie dana metoda płatności, należy ustawić ją w tym parametrze przy rejestracji
+- `urlStatus` - adres, który zostanie wykorzystany do weryfikacji transakcji przez serwer partnera po zakończeniu procesu płatności w bibliotece mobilnej
 
 
 ### 1.3 Weryfikacja poprawności transakcji
 
 Po dokonaniu wpłaty biblioteka kończy pracę i wraca do aplikacji. Nie czeka na zaksięgowanie jej w systemie Przelewy24 – zwraca do aplikacji status `paymentFinished` albo `paymentError` jeżeli coś poszło nie tak.
-W momencie zaksięgowania wpłaty system Przelewy24 wysyła asynchronicznie powiadomienie o transakcji na adres `p24_url_status` podany przez partnera w konfiguracji. Serwer partnera po odebraniu powiadomienia musi wysłać do Przelewy24 żądanie weryfikacji transakcji. W tym momencie serwer sprzedawcy posiada informację o zaksięgowaniu wpłaty. Aplikacja powinna wtedy odpytać swój serwer o status transakcji.
+W momencie zaksięgowania wpłaty system Przelewy24 wysyła asynchronicznie powiadomienie o transakcji na adres `urlStatus` podany przez partnera w konfiguracji. Serwer partnera po odebraniu powiadomienia musi wysłać do Przelewy24 żądanie weryfikacji transakcji. W tym momencie serwer sprzedawcy posiada informację o zaksięgowaniu wpłaty. Aplikacja powinna wtedy odpytać swój serwer o status transakcji.
 
-Parametr `p24_url_status` należy ustawić w panelu transakcyjnym (w tym celu należy przesłać adres skryptu na [serwis@przelewy24.pl](serwis@przelewy24.pl) z adresu e- mail, na który jest założone konto), albo w bibliotece: `paymentParams.setUrlStatus("http://XXXXXX")`. Ustawienie w bibliotece ma większy priorytet od ustawienia w panelu transakcyjnym.
+Parametr `urlStatus` należy ustawić w panelu transakcyjnym (w tym celu należy przesłać adres skryptu na [serwis@przelewy24.pl](serwis@przelewy24.pl) z adresu e-mail, na który jest założone konto).
 
 ## 2. Definicje
 
